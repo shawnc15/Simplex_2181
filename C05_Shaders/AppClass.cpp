@@ -76,12 +76,15 @@ void AppClass::InitVariables(void)
 	//vertex 1
 	lVertex.push_back(glm::vec3(-1.0f, -1.0f, 0.0f)); //position
 	lVertex.push_back(glm::vec3(1.0f, 0.0f, 0.0f)); //color
+	//lVertex.push_back(glm::vec3(0.0f, 1.0f, 1.0f)); //complimentary color
 	//vertex 2
 	lVertex.push_back(glm::vec3(1.0f, -1.0f, 0.0f)); //position
 	lVertex.push_back(glm::vec3(0.0f, 1.0f, 0.0f)); //color
+	//lVertex.push_back(glm::vec3(1.0f, 0.0f, 1.0f)); //complimentary color
 	//vertex 3
 	lVertex.push_back(glm::vec3(0.0f, 1.0f, 0.0f)); //position
-	lVertex.push_back(glm::vec3(0.0f, 0.0f, 1.0f)); //color
+	lVertex.push_back(glm::vec3(0.0f,0.0f, 1.0f)); //color
+	//lVertex.push_back(glm::vec3(1.0f, 1.0f, 0.0f)); //complimentary color
 	
 	glGenVertexArrays(1, &m_uVAO);//Generate vertex array object
 	glGenBuffers(1, &m_uVBO);//Generate Vertex Buffered Object
@@ -114,6 +117,8 @@ void AppClass::ProcessKeyboard(sf::Event a_event)
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
 		m_v3Color = glm::vec3(0.0f, 0.0f, 1.0f);
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num0))
+		m_v3Color = glm::vec3(-1.0f, -1.0f, -1.0f);
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4))
 		m_v3Color = glm::vec3(-1.0f, -1.0f, -1.0f);
 }
 void AppClass::Display(void)
