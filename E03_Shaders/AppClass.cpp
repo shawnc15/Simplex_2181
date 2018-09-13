@@ -73,15 +73,15 @@ void AppClass::InitShaders(void)
 void AppClass::InitVariables(void)
 {
 	std::vector<glm::vec3> lVertex;
-	//vertex 1
+	//vertex 1 - left
 	lVertex.push_back(glm::vec3(-1.0f, -1.0f, 0.0f)); //position
 	lVertex.push_back(glm::vec3(1.0f, 0.0f, 0.0f)); //color
 	//lVertex.push_back(glm::vec3(0.0f, 1.0f, 1.0f)); //complimentary color
-	//vertex 2
+	//vertex 2 - right
 	lVertex.push_back(glm::vec3(1.0f, -1.0f, 0.0f)); //position
 	lVertex.push_back(glm::vec3(0.0f, 1.0f, 0.0f)); //color
 	//lVertex.push_back(glm::vec3(1.0f, 0.0f, 1.0f)); //complimentary color
-	//vertex 3
+	//vertex 3 - top
 	lVertex.push_back(glm::vec3(0.0f, 1.0f, 0.0f)); //position
 	lVertex.push_back(glm::vec3(0.0f,0.0f, 1.0f)); //color
 	//lVertex.push_back(glm::vec3(1.0f, 1.0f, 0.0f)); //complimentary color
@@ -110,16 +110,24 @@ void AppClass::ProcessKeyboard(sf::Event a_event)
 {
 	if (a_event.key.code == sf::Keyboard::Key::Escape)//Event says I pressed the Escape key
 		m_bRunning = false;
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)) //I am currently pressing the Num1 (not the same as above)
-		m_v3Color = glm::vec3(1.0f, 0.0f, 0.0f);
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
+		m_v3Color = glm::vec3(1.0f, 0.0f, 0.0f);//I am currently pressing the Num1 (not the same as above)
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
 		m_v3Color = glm::vec3(0.0f, 1.0f, 0.0f);
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
 		m_v3Color = glm::vec3(0.0f, 0.0f, 1.0f);
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num0))
+	{
 		m_v3Color = glm::vec3(-1.0f, -1.0f, -1.0f);
+		GLuint inverse = glGetUniformLocation(m_uShaderProgramID, "complimentary");
+		glUniform1i(inverse, 0);
+	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4))
-		m_v3Color = glm::vec3(0.7f, 0.3f, 0.2f);
+	{
+		GLuint inverse = glGetUniformLocation(m_uShaderProgramID, "complimentary");
+		glUniform1i(inverse, 1);
+	}
+		
 }
 void AppClass::Display(void)
 {
