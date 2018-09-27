@@ -275,8 +275,32 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	Release();
 	Init();
 
+	
+
 	// Replace this with your code
 	//GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	vector3 center = vector3(0.0f, 0.0f, 0.0f);
+	vector3 tip = vector3(center.x,center.y, center.z + a_fHeight);
+	vector3 p2;
+	vector3 p3;
+	float step = (2.0f * PI) / float(a_nSubdivisions);
+	float sine, cosine;
+
+	for (float theta = 0.0f; theta < 2.0f * PI; theta += step)
+	{
+		sine = sin(theta);
+		cosine = cos(theta);
+
+		p2 = vector3(center.x + (cosine*a_fRadius), center.y + (sine*a_fRadius), center.z);
+		theta += step;
+		cosine = cos(theta);
+		sine = sin(theta);
+		p3 = vector3(center.x + (cosine*a_fRadius), center.y + (sine*a_fRadius), center.z);
+		theta -= step;
+
+		AddTri(center, p3, p2);
+		AddTri(tip, p2, p3);
+	}
 	// -------------------------------
 
 	// Adding information about color
@@ -300,7 +324,38 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	//GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	vector3 center = vector3(0.0f, 0.0f, 0.0f);
+	vector3 topCenter = vector3(center.x, center.y, center.z + a_fHeight);
+	vector3 baseP2;
+	vector3 baseP3;
+	vector3 topP2;
+	vector3 topP3;
+	float step = (2.0f * PI) / float(a_nSubdivisions);
+	float sine, cosine;
+
+	for (float theta = 0.0f; theta < 2.0f * PI; theta += step)
+	{
+		sine = sin(theta);
+		cosine = cos(theta);
+
+		//top
+		topP2 = vector3(topCenter.x + (cosine*a_fRadius), topCenter.y + (sine*a_fRadius), topCenter.z);
+		theta += step;
+		cosine = cos(theta);
+		sine = sin(theta);
+		topP3 = vector3(topCenter.x + (cosine*a_fRadius), topCenter.y + (sine*a_fRadius), topCenter.z);
+		theta -= step;
+		AddTri(topCenter, topP2, topP3);
+
+		//base
+		baseP2 = vector3(topP2.x, topP2.y, center.z);
+		baseP3 = vector3(topP3.x, topP3.y, center.z);
+		AddTri(center, baseP3, baseP2);
+
+		//side
+		AddQuad(baseP2, baseP3, topP2, topP3);
+	}
 	// -------------------------------
 
 	// Adding information about color
@@ -330,7 +385,56 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
+	//GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
+	vector3 center = vector3(0.0f, 0.0f, 0.0f);
+	vector3 baseP2;
+	vector3 baseP3;
+	vector3 baseP4;
+	vector3 baseP5;
+
+	vector3 topCenter = vector3(center.x, center.y, center.z + a_fHeight);
+	vector3 topP2;
+	vector3 topP3;
+	vector3 topP4;
+	vector3 topP5;
+	float step = (2.0f * PI) / float(a_nSubdivisions);
+	float sine, cosine;
+
+	for (float theta = 0.0f; theta < 2.0f * PI; theta += step)
+	{
+		sine = sin(theta);
+		cosine = cos(theta);
+
+		//top-inner
+		topP2 = vector3(topCenter.x + (cosine*a_fInnerRadius), topCenter.y + (sine*a_fInnerRadius), topCenter.z);
+		theta += step;
+		cosine = cos(theta);
+		sine = sin(theta);
+		topP3 = vector3(topCenter.x + (cosine*a_fInnerRadius), topCenter.y + (sine*a_fInnerRadius), topCenter.z);
+		theta -= step;
+
+		//top-outer
+		sine = sin(theta);
+		cosine = cos(theta);
+		topP4 = vector3(topCenter.x + (cosine*a_fOuterRadius), topCenter.y + (sine*a_fOuterRadius), topCenter.z);
+		theta += step;
+		cosine = cos(theta);
+		sine = sin(theta);
+		topP5 = vector3(topCenter.x + (cosine*a_fOuterRadius), topCenter.y + (sine*a_fOuterRadius), topCenter.z);
+		theta -= step;
+		AddQuad(topP2, topP4, topP3, topP5);
+
+		//base
+		baseP2 = vector3(topP2.x, topP2.y, center.z);
+		baseP3 = vector3(topP3.x, topP3.y, center.z);
+		baseP4 = vector3(topP4.x, topP4.y, center.z);
+		baseP5 = vector3(topP5.x, topP5.y, center.z);
+		AddQuad(baseP5, baseP4, baseP3, baseP2);
+
+		//side
+		AddQuad(topP2, topP3, baseP2, baseP3);
+		AddQuad(topP5, topP4, baseP5, baseP4);
+	}
 	// -------------------------------
 
 	// Adding information about color
@@ -387,7 +491,84 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	//GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	vector3 center = vector3(0.0f, 0.0f, 0.0f);
+	vector3 p2;
+	vector3 p3;
+	float step = (2.0f * PI) / float(a_nSubdivisions);
+	float diskStep = float((a_fRadius / a_nSubdivisions));
+	float sine, cosine;
+	vector3 p4;
+	vector3 p5;
+	//bool half = false;
+
+	for (float i = 0; i < a_nSubdivisions; i++)
+	{
+		for (float theta = 0.0f; theta < 2.0f * PI; theta += step)
+		{
+			sine = sin(theta);
+			cosine = cos(theta);
+			
+			if (i <= a_nSubdivisions/2.0f)
+			{
+				
+				if (i == a_nSubdivisions/2.0f)
+				{
+					p2 = vector3(center.x + (cosine*(diskStep*(i + 1.0f))), center.y + (sine*(diskStep*(i + 1.0f))), center.z);
+					p4 = vector3(center.x + (cosine*(diskStep*(i - 2.0f))), center.y + (sine*(diskStep*(i - 2.0f))), center.z + diskStep);
+					theta += step;
+					cosine = cos(theta);
+					sine = sin(theta);
+					p3 = vector3(center.x + (cosine*(diskStep*(i + 1.0f))), center.y + (sine*(diskStep*(i + 1.0f))), center.z);
+					p5 = vector3(center.x + (cosine*(diskStep*(i - 2.0f))), center.y + (sine*(diskStep*(i - 2.0f))), center.z + diskStep);
+					theta -= step;
+					AddQuad(p2, p3, p4, p5);
+				}
+				else
+				{
+					p2 = vector3(center.x + (cosine*(diskStep*(i + 1.0f))), center.y + (sine*(diskStep*(i + 1.0f))), center.z);
+					p4 = vector3(center.x + (cosine*(diskStep*(i + 2.0f))), center.y + (sine*(diskStep*(i + 2.0f))), center.z + diskStep);
+					theta += step;
+					cosine = cos(theta);
+					sine = sin(theta);
+					p3 = vector3(center.x + (cosine*(diskStep*(i + 1.0f))), center.y + (sine*(diskStep*(i + 1.0f))), center.z);
+					p5 = vector3(center.x + (cosine*(diskStep*(i + 2.0f))), center.y + (sine*(diskStep*(i + 2.0f))), center.z + diskStep);
+					theta -= step;
+					AddTri(center, p3, p2);
+					AddQuad(p2, p3, p4, p5);
+				}
+			}
+			else
+			{
+				if (i == a_nSubdivisions-1)
+				{
+					p2 = vector3(center.x + (cosine*(diskStep)), center.y + (sine*(diskStep)), center.z);
+					theta += step;
+					cosine = cos(theta);
+					sine = sin(theta);
+					p3 = vector3(center.x + (cosine*(diskStep)), center.y + (sine*(diskStep)), center.z);
+					theta -= step;
+					AddTri(center, p2, p3);
+				}
+				else
+				{
+					p2 = vector3(center.x + (cosine*(diskStep*(i - 1))), center.y + (sine*(diskStep*(i - 1))), center.z);
+					p4 = vector3(center.x + (cosine*(diskStep*(i - 2.0f))), center.y + (sine*(diskStep*(i - 2.0f))), center.z + diskStep);
+					theta += step;
+					cosine = cos(theta);
+					sine = sin(theta);
+					p3 = vector3(center.x + (cosine*(diskStep*(i - 1))), center.y + (sine*(diskStep*(i - 1))), center.z);
+					p5 = vector3(center.x + (cosine*(diskStep*(i - 2.0f))), center.y + (sine*(diskStep*(i - 2.0f))), center.z + diskStep);
+					theta -= step;
+					AddTri(center, p2, p3);
+					AddQuad(p2, p3, p4, p5);
+				}
+
+			}
+		}
+		center.z += diskStep;
+	}
+
 	// -------------------------------
 
 	// Adding information about color
