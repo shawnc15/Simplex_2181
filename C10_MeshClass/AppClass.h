@@ -16,6 +16,11 @@ class Application
 {
 	MyMesh* m_pMesh = nullptr;
 	MyMesh* m_pMesh1 = nullptr;
+	MyMesh* m_pMesh2 = nullptr;
+	MyMesh* m_pMesh3 = nullptr;
+	MyMesh* m_pMesh4 = nullptr;
+	MyMesh* m_pMesh5 = nullptr;
+	MyMesh* m_pMesh6 = nullptr;
 
 	String m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
 private:
