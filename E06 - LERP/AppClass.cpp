@@ -2,7 +2,7 @@
 void Application::InitVariables(void)
 {
 	//Change this to your name and email
-	m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
+	m_sProgrammer = "Shawn Clark - sic1278@rit.edu";
 
 	//Set the position and target of the camera
 	m_pCameraMngr->SetPositionTargetAndUpward(vector3(5.0f,3.0f,15.0f), ZERO_V3, AXIS_Y);
@@ -59,9 +59,22 @@ void Application::Display(void)
 
 
 	//your code goes here
-	v3CurrentPos = vector3(0.0f, 0.0f, 0.0f);
+	int listSize = m_stopsList.size();
+	static int step = 0;
+	vector3 start = m_stopsList[step]; //start point
+	vector3 end = m_stopsList[(step+1)%listSize]; //end point
+	float timeToStop = 1.0; //time to each step
+	float percent = MapValue(fTimer, 0.0f, timeToStop, 0.0f, 1.0f);
+	v3CurrentPos = glm::lerp(start, end, percent); //move model via lerp
+
+	//if model has completed lerp
+	if (percent >= 1.0f)
+	{
+		step++; //increment step
+		fTimer = m_pSystem->GetDeltaTime(uClock);//restart timer
+		step %= listSize; //keep step in bounds
+	}
 	//-------------------
-	
 
 
 	
