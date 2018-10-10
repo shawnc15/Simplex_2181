@@ -82,6 +82,9 @@ public:
 	OUTPUT: index of the generated Mesh
 	*/
 	int GeneratePlane(float a_fSize, vector3 a_v3Color = C_WHITE);
+
+	int GenerateCircle(float a_fRadius, int a_nSubdivisions, vector3 a_v3Color = C_WHITE);
+
 	/*
 	USAGE: Generates a cube
 	ARGUMENTS:

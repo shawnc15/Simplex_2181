@@ -17,44 +17,25 @@ void MyMesh::GenerateCircle(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 		then call the AddTri function to generate a_nSubdivision number of faces
 	*/
 	vector3 center = vector3(0.0f, 0.0f, 0.0f);
-	vector3 p1;
 	vector3 p2;
-	vector3 temp;
-	float angle = (2.0f * PI) / float(a_nSubdivisions);
+	vector3 p3;
+	float step = (2.0f * PI) / float(a_nSubdivisions);
 	float sine, cosine;
-	
-	for (float theta = 0.0f; theta < 2.0f * PI; theta += angle)
+
+	for (float theta = 0.0f; theta < 2.0f * PI; theta += step)
 	{
 		sine = sin(theta);
 		cosine = cos(theta);
-		//p1 = vector3(center.x + (cosine*a_fRadius), center.y + (sine*a_fRadius), 0.0f);
-		//p2 = vector3(center.x + (sine*a_fRadius * -1), center.y + (cosine*a_fRadius), 0.0f);
-		if (theta == 0.0f)
-		{
-			p1 = vector3(0.0f,a_fRadius * 1.0f, 0.0f);
-			p2 = vector3(center.x + (sin(angle)*a_fRadius * -1), center.y + (cos(angle)*a_fRadius), 0.0f);
-		}
-		else
-		{
-			p1 = temp;
-			if (theta == (2.0f*PI)-angle)
-			{
-				p2 = vector3(0.0f, a_fRadius * 1.0f, 0.0f);
-			}
-			else
-			{
-				p2 = vector3(center.x + (sine*a_fRadius * -1), center.y + (cosine*a_fRadius), 0.0f);
-			}
-			p2 = vector3(center.x + (sine*a_fRadius * -1), center.y + (cosine*a_fRadius), 0.0f);
-		}
-		
 
-		AddTri(center, p1, p2);
-		temp = p2;
+		p2 = vector3(center.x + (cosine*a_fRadius), center.y + (sine*a_fRadius), center.z);
+		theta += step;
+		cosine = cos(theta);
+		sine = sin(theta);
+		p3 = vector3(center.x + (cosine*a_fRadius), center.y + (sine*a_fRadius), center.z);
+		theta -= step;
+
+		AddTri(center, p2, p3);
 	}
-	//AddTri(center, vector3(x2, y2, 0.0f), vector3(x2, -y2, 0.0f));
-	
-
 	// Adding information about color
 	CompleteMesh(a_v3Color);
 	CompileOpenGL3X();

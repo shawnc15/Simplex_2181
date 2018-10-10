@@ -173,6 +173,47 @@ void MyMesh::AddQuad(vector3 a_vBottomLeft, vector3 a_vBottomRight, vector3 a_vT
 	AddVertexPosition(a_vBottomRight);
 	AddVertexPosition(a_vTopRight);
 }
+void MyMesh::GenerateCircle(float a_fRadius, int a_nSubdivisions, vector3 a_v3Color)
+{
+	if (a_fRadius < 0.01f)
+		a_fRadius = 0.01f;
+
+	if (a_nSubdivisions < 3)
+		a_nSubdivisions = 3;
+	if (a_nSubdivisions > 360)
+		a_nSubdivisions = 360;
+
+	Release();
+	Init();
+
+	/*
+		Calculate a_nSubdivisions number of points around a center point in a radial manner
+		then call the AddTri function to generate a_nSubdivision number of faces
+	*/
+	vector3 center = vector3(0.0f, 0.0f, 0.0f);
+	vector3 p2;
+	vector3 p3;
+	float step = (2.0f * PI) / float(a_nSubdivisions);
+	float sine, cosine;
+
+	for (float theta = 0.0f; theta < 2.0f * PI; theta += step)
+	{
+		sine = sin(theta);
+		cosine = cos(theta);
+
+		p2 = vector3(center.x + (cosine*a_fRadius), center.y + (sine*a_fRadius), center.z);
+		theta += step;
+		cosine = cos(theta);
+		sine = sin(theta);
+		p3 = vector3(center.x + (cosine*a_fRadius), center.y + (sine*a_fRadius), center.z);
+		theta -= step;
+
+		AddTri(center, p2, p3);
+	}
+	// Adding information about color
+	CompleteMesh(a_v3Color);
+	CompileOpenGL3X();
+}
 void MyMesh::GenerateCube(float a_fSize, vector3 a_v3Color)
 {
 	if (a_fSize < 0.01f)

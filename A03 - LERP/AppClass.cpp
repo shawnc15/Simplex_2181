@@ -2,7 +2,7 @@
 void Application::InitVariables(void)
 {
 	//Change this to your name and email
-	m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
+	m_sProgrammer = "Shawn Clark - sic1278@rit.edu";
 	
 	//Set the position and target of the camera
 	//(I'm at [0,0,10], looking at [0,0,0] and up is the positive Y axis)
@@ -35,7 +35,7 @@ void Application::InitVariables(void)
 	for (uint i = uSides; i < m_uOrbits + uSides; i++)
 	{
 		vector3 v3Color = WaveLengthToRGB(uColor); //calculate color based on wavelength
-		m_shapeList.push_back(m_pMeshMngr->GenerateTorus(fSize, fSize - 0.1f, 3, i, v3Color)); //generate a custom torus and add it to the meshmanager
+		m_shapeList.push_back(m_pMeshMngr->GenerateCircle(fSize,i,v3Color)); //generate a custom torus and add it to the meshmanager
 		std::vector<vector3> stopList;//add list of stops to list of stops
 		fSize += 0.5f; //increment the size for the next orbit
 		uColor -= static_cast<uint>(decrements); //decrease the wavelength
