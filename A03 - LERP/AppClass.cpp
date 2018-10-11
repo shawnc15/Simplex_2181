@@ -3,7 +3,7 @@ void Application::InitVariables(void)
 {
 	//Change this to your name and email
 	m_sProgrammer = "Shawn Clark - sic1278@rit.edu";
-	
+
 	//Set the position and target of the camera
 	//(I'm at [0,0,10], looking at [0,0,0] and up is the positive Y axis)
 	m_pCameraMngr->SetPositionTargetAndUpward(AXIS_Z * 20.0f, ZERO_V3, AXIS_Y);
@@ -17,17 +17,18 @@ void Application::InitVariables(void)
 	{
 		m_v4ClearColor = vector4(ZERO_V3, 1.0f);
 	}
-	
+
 	//if there are no segments create 7
-	if(m_uOrbits < 1)
+	if (m_uOrbits < 1)
 		m_uOrbits = 7;
 
 	float fSize = 1.0f; //initial size of orbits
+	float fRadius = 0.95f;
 
 	//creating a color using the spectrum 
 	uint uColor = 650; //650 is Red
 	//prevent division by 0
-	float decrements = 250.0f / (m_uOrbits > 1? static_cast<float>(m_uOrbits - 1) : 1.0f); //decrement until you get to 400 (which is violet)
+	float decrements = 250.0f / (m_uOrbits > 1 ? static_cast<float>(m_uOrbits - 1) : 1.0f); //decrement until you get to 400 (which is violet)
 	/*
 		This part will create the orbits, it start at 3 because that is the minimum subdivisions a torus can have
 	*/
@@ -35,10 +36,32 @@ void Application::InitVariables(void)
 	for (uint i = uSides; i < m_uOrbits + uSides; i++)
 	{
 		vector3 v3Color = WaveLengthToRGB(uColor); //calculate color based on wavelength
-		m_shapeList.push_back(m_pMeshMngr->GenerateCircle(fSize,i,v3Color)); //generate a custom torus and add it to the meshmanager
+		m_shapeList.push_back(m_pMeshMngr->GenerateTorus(fSize, fSize - 0.1f, 3, i, v3Color)); //generate a custom torus and add it to the meshmanager
 		std::vector<vector3> stopList;//add list of stops to list of stops
+		vector3 center = vector3(0.0f, 0.0f, 0.0f);
+		vector3 p2;
+		vector3 p3;
+		float step = (2.0f * PI) / float(i);
+		float sine, cosine;
+
+		for (float theta = 0.0f; theta < 2.0f * PI; theta += step)
+		{
+			sine = sin(theta);
+			cosine = cos(theta);
+
+			p2 = vector3(center.x + (cosine*fRadius), center.y + (sine*fRadius), center.z);
+			theta += step;
+			cosine = cos(theta);
+			sine = sin(theta);
+			p3 = vector3(center.x + (cosine*fRadius), center.y + (sine*fRadius), center.z);
+			theta -= step;
+			stopList.push_back(p2);
+		}
 		fSize += 0.5f; //increment the size for the next orbit
+		fRadius += 0.5f;
 		uColor -= static_cast<uint>(decrements); //decrease the wavelength
+		m_stops.push_back(stopList);
+		stopIndex.push_back(0);
 	}
 }
 void Application::Update(void)
@@ -65,6 +88,7 @@ void Application::Display(void)
 	*/
 	//m4Offset = glm::rotate(IDENTITY_M4, 1.5708f, AXIS_Z);
 
+	bool complete = false;
 	// draw a shapes
 	for (uint i = 0; i < m_uOrbits; ++i)
 	{
@@ -72,6 +96,35 @@ void Application::Display(void)
 
 		//calculate the current position
 		vector3 v3CurrentPos = ZERO_V3;
+
+		//Get a timer
+		static float fTimer = 0;	//store the new timer
+		static uint uClock = m_pSystem->GenClock(); //generate a new clock for that timer
+		fTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for that timer
+
+		//your code goes here
+		int listSize = m_stops[i].size();
+		vector3 start = m_stops[i][stopIndex[i]]; //start point
+		vector3 end = m_stops[i][(stopIndex[i] + 1) % listSize]; //end point
+		float timeToStop = 0.5; //time to each step
+		float percent = MapValue(fTimer, 0.0f, timeToStop, 0.0f, 1.0f);
+		v3CurrentPos = glm::lerp(start, end, percent); //move model via lerp
+
+		//if model has completed lerp
+		if (percent >= 1.0f)
+		{
+
+			for (int j = 0; j < stopIndex.size(); j++)
+			{
+				stopIndex[j]++;
+				fTimer = m_pSystem->GetDeltaTime(uClock);//restart timer
+				if (stopIndex[j] == m_stops[j].size())
+				{
+					stopIndex[j] = 0;
+				}
+			}
+		}
+		//-------------------
 		matrix4 m4Model = glm::translate(m4Offset, v3CurrentPos);
 
 		//draw spheres
@@ -83,10 +136,10 @@ void Application::Display(void)
 
 	//clear the render list
 	m_pMeshMngr->ClearRenderList();
-	
+
 	//draw gui
 	DrawGUI();
-	
+
 	//end the current frame (internally swaps the front and back buffers)
 	m_pWindow->display();
 }
