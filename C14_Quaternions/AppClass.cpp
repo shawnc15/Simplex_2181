@@ -8,6 +8,8 @@ void Application::InitVariables(void)
 	//initializing the model
 	m_pModel = new Simplex::Model();
 
+	m_pMesh = new MyMesh();
+	m_pMesh->GenerateCube(2.0f, C_RED);
 	//Load a model
 	m_pModel->Load("Minecraft\\Steve.obj");
 }
@@ -28,11 +30,11 @@ void Application::Update(void)
 	float fDeltaTime = m_pSystem->GetDeltaTime(uClock);
 
 #pragma region SLERP
-	if (false)
+	if (true)
 	{
 		quaternion q1;
 		quaternion q2 = glm::angleAxis(glm::radians(359.9f), vector3(0.0f, 0.0f, 1.0f));
-		float fPercentage = MapValue(fTimer, 0.0f, 5.0f, 0.0f, 1.0f);
+		float fPercentage = MapValue(fTimer, 0.0f, 1.0f, 0.0f, 1.0f);
 		quaternion qSLERP = glm::mix(q1, q2, fPercentage);
 		m_m4Steve = glm::toMat4(qSLERP);
 	}
@@ -49,7 +51,7 @@ void Application::Update(void)
 	}
 #pragma endregion
 #pragma region orientation using quaternions
-	if (true)
+	if (false)
 	{
 		m_m4Steve = glm::toMat4(m_qOrientation);
 	}
@@ -66,18 +68,40 @@ void Application::Display(void)
 	// Clear the screen
 	ClearScreen();
 	
+	matrix4 m4View = m_pCameraMngr->GetViewMatrix();
+	matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix();
+	matrix4 m4Model = glm::translate(m_v3Orientation);
+
+	//m4Projection = glm::ortho(0.0f, 7.5f, -5.0f, 5.0f, 0.01f, 1000.0f);
+	float fFOV = 45.0f;
+	float fAspect = m_pSystem->GetWindowWidth() / m_pSystem->GetWindowHeight();
+	float fNear = 0.01f;
+	float fFar = 20.0f;
+
+	m4Projection = glm::perspective(fFOV, fAspect, fNear, fFar);
+
+	//Helpful for A03 camera movement
+	vector3 v3Position = vector3(0.0f, 0.0f, 10.0f);
+	vector3 v3Target;
+	vector3 v3Up = vector3(0.0f, 1.0f, 0.0f);
+
+	m4View = glm::lookAt(v3Position, v3Target, v3Up);
+	/*------------------*/
+
+	//m_pMesh->Render(m4Projection, m4View, m4Model);
+
 	// draw a skybox
 	m_pMeshMngr->AddSkyboxToRenderList();
 
-	matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix();
-	matrix4 m4View = m_pCameraMngr->GetViewMatrix();
+	//matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix();
+	//matrix4 m4View = m_pCameraMngr->GetViewMatrix();
 
-	float fovy = 45.0f; //fov
+	/*float fovy = 45.0f; //fov
 	float aspect = m_pSystem->GetWindowWidth() / m_pSystem->GetWindowHeight(); //aspect ratio
 	float zNear = 0.001f; //near clipping plane
 	float zFar = 1000.0f; //far clipping plane
 
-	m4Projection = glm::perspective(fovy, aspect, zNear, zFar);
+	m4Projection = glm::perspective(fovy, aspect, zNear, zFar);*/
 
 	m_pCameraMngr->SetProjectionMatrix(m4Projection);
 	m_pCameraMngr->SetViewMatrix(m4View);
@@ -98,6 +122,8 @@ void Application::Release(void)
 {
 	//release model
 	SafeDelete(m_pModel);
+
+	SafeDelete(m_pMesh);
 
 	//release GUI
 	ShutdownGUI();

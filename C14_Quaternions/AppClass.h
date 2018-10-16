@@ -20,6 +20,7 @@ class Application
 	quaternion m_qOrientation; //orientation for the Model in quaternions
 	float m_ffovy = 45.0f;
 	String m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
+	MyMesh* m_pMesh = nullptr;
 
 private:
 	static ImGuiObject gui; //GUI object
