@@ -152,23 +152,54 @@ void Simplex::MyCamera::CalculateProjectionMatrix(void)
 
 void MyCamera::MoveForward(float a_fDistance)
 {
-	//The following is just an example and does not take in account the forward vector (AKA view vector)
+	//move based on forward vector
 	m_v3Position += glm::normalize(m_v3Target - m_v3Position) * a_fDistance;
 	m_v3Target += glm::normalize(m_v3Target - m_v3Position) * a_fDistance;
-	m_v3Above += vector3(0.0f, 0.0f, -a_fDistance);
+	m_v3Above += glm::normalize(m_v3Target - m_v3Position) * a_fDistance;
+	CalculateProjectionMatrix();
+	CalculateViewMatrix();
 }
 
 void MyCamera::MoveVertical(float a_fDistance)
 {
+	//move along above vector
 	m_v3Position += glm::normalize(m_v3Above - m_v3Position) * a_fDistance;
 	m_v3Target += glm::normalize(m_v3Above - m_v3Position) * a_fDistance;
-	m_v3Above += vector3(0.0f, -a_fDistance, 0.0f);
+	m_v3Above += glm::normalize(m_v3Above - m_v3Position) * a_fDistance;
+	CalculateProjectionMatrix();
+	CalculateViewMatrix();
 }//Needs to be defined
 
 void MyCamera::MoveSideways(float a_fDistance)
 {
-	vector3 perp = glm::cross(m_v3Position, m_v3Above);
-	m_v3Position += glm::normalize(perp) * a_fDistance;
-	m_v3Target += glm::normalize(perp) * a_fDistance;
-	m_v3Above += glm::normalize(perp) * a_fDistance;
+	//calculate right vector
+	vector3 right = glm::abs(glm::cross(m_v3Target, m_v3Above));
+	//move along the right vector
+	m_v3Position.x += glm::normalize(right.x) * a_fDistance;
+	m_v3Target.x += glm::normalize(right.x) * a_fDistance;
+	m_v3Above.x += glm::normalize(right.x) * a_fDistance;
+	CalculateProjectionMatrix();
+	CalculateViewMatrix();
 }//Needs to be defined
+
+void MyCamera::ChangePitch(float angle) 
+{
+	//calc right vector
+	vector3 right = glm::abs(glm::cross(m_v3Target, m_v3Above));
+	//calc forward vector
+	vector3 front = glm::normalize(m_v3Target - m_v3Position);
+	//get direction vector based on angle
+	vector3 direction = glm::rotate(front, angle * 0.5f, right);
+	//move target
+	m_v3Target.y = direction.y + m_v3Position.y;
+}
+void MyCamera::ChangeYaw(float angle) 
+{
+	//calc forward vector
+	vector3 front = glm::normalize(m_v3Target - m_v3Position);
+	//calc direction vector based on angle
+	vector3 direction = glm::rotate(front, angle * 0.5f, m_v3Above);
+	//move target
+	m_v3Target.x = direction.x + m_v3Position.x;
+	m_v3Target.z = direction.z + m_v3Position.z;
+}
