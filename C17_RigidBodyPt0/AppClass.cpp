@@ -50,9 +50,7 @@ void Application::Update(void)
 	m_pSteveRB->SetModelMatrix(mSteve);
 	
 
-	m_pCreeper->AddToRenderList();
-	//m_pCreeper->PlaySequence();
-	m_pCreeperRB->AddToRenderList();
+	
 
 	m_pSteve->AddToRenderList();
 	m_pSteveRB->AddToRenderList();
@@ -64,6 +62,9 @@ void Application::Update(void)
 		m_pCreeperRB->SetColor(C_RED);
 		m_pSteveRB->SetColor(C_RED);
 	}
+	m_pCreeper->AddToRenderList();
+	//m_pCreeper->PlaySequence();
+	m_pCreeperRB->AddToRenderList();
 }
 void Application::Display(void)
 {
