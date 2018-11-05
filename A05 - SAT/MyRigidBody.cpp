@@ -286,6 +286,9 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	Simplex that might help you [eSATResults] feel free to use it.
 	(eSATResults::SAT_NONE has a value of 0)
 	*/
+	vector3 centerA = vector3(vector4(m_v3Center, 0.0f) * m_m4ToWorld);
+	vector3 centerB = vector3(vector4(a_pOther->GetCenterLocal(), 0.0f) * a_pOther->GetModelMatrix());
+	vector3 transVector = centerB - centerA;
 
 	//there is no axis test that separates this two objects
 	return eSATResults::SAT_NONE;
