@@ -286,9 +286,109 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	Simplex that might help you [eSATResults] feel free to use it.
 	(eSATResults::SAT_NONE has a value of 0)
 	*/
-	vector3 centerA = vector3(vector4(m_v3Center, 0.0f) * m_m4ToWorld);
-	vector3 centerB = vector3(vector4(a_pOther->GetCenterLocal(), 0.0f) * a_pOther->GetModelMatrix());
-	vector3 transVector = centerB - centerA;
+	std::vector<vector3> axesA, axesB;
+
+	axesA.push_back(glm::normalize(vector3(m_v3MaxL.x, m_v3Center.y, m_v3Center.z) - m_v3Center));
+	axesA.push_back(glm::normalize(vector3(m_v3Center.x, m_v3MaxL.y, m_v3Center.z) - m_v3Center));
+	axesA.push_back(glm::normalize(vector3(m_v3Center.x, m_v3Center.y, m_v3MaxL.z) - m_v3Center));
+
+	axesB.push_back(glm::normalize(vector3(a_pOther->GetMaxLocal().x, a_pOther->GetCenterLocal().y, a_pOther->GetCenterLocal().z) - a_pOther->GetCenterLocal()));
+	axesB.push_back(glm::normalize(vector3(a_pOther->GetCenterLocal().x, a_pOther->GetMaxLocal().y, a_pOther->GetCenterLocal().z) - a_pOther->GetCenterLocal()));
+	axesB.push_back(glm::normalize(vector3(a_pOther->GetCenterLocal().x, a_pOther->GetCenterLocal().y, a_pOther->GetMaxLocal().z) - a_pOther->GetCenterLocal()));
+
+	float rA, rB;
+	matrix3 R, AbsR;
+
+	//compute rotation matrix expressing b in a's coordinate frame
+	for (uint i = 0; i < 3; i++)
+	{
+		for (uint j = 0; j < 3; j++)
+		{
+			R[i][j] = glm::dot(axesA[i], axesB[j]);
+		}
+	}
+
+	//compute translation matrix
+	vector3 centerA = GetCenterGlobal();
+	vector3 centerB = a_pOther->GetCenterGlobal();
+	vector3 transVector =centerB - centerA;
+
+	//bring translation into a's coordinate frame
+	transVector = vector3(glm::dot(transVector, axesA[0]), glm::dot(transVector, axesA[1]), glm::dot(transVector, axesA[2]));
+
+	//calc extents
+	vector3 extentsA = vector3(vector4(m_v3MaxL - m_v3Center, 0.0f) * m_m4ToWorld);
+	vector3 extentsB = vector3(vector4(a_pOther->GetMaxLocal() - a_pOther->GetCenterLocal(), 0.0f) * a_pOther->GetModelMatrix());
+
+	//compute common subexpressions
+	for (uint i = 0; i < 3; i++)
+	{
+		for (uint j = 0; j < 3; j++)
+		{
+			AbsR[i][j] = glm::abs(R[i][j]) + std::numeric_limits<float>::epsilon();
+		}
+	}
+
+	//test axes plane = a0, a1, a2
+	for (uint i = 0; i < 3; i++)
+	{
+		rA = extentsA[i];
+		rB = extentsB[0] * AbsR[i][0] + extentsB[1] * AbsR[i][1] + extentsB[2] * AbsR[i][2];
+		if (glm::abs(transVector[i]) > rA + rB) return 0;
+	}
+
+	//test axes plane = b0, b1, b2
+	for (uint i = 0; i < 3; i++)
+	{
+		rA = extentsA[0] * AbsR[0][i] + extentsA[1] * AbsR[1][i] + extentsA[2] * AbsR[2][i];
+		rB = extentsB[i];
+		if (glm::abs(transVector[0] * R[0][i] + transVector[1] * R[1][i] + transVector[2] * R[2][i]) > rA + rB) return 0;
+	}
+
+	//test axis A0xB0
+	rA = extentsA[1] * AbsR[2][0] + extentsA[2] * AbsR[1][0];
+	rB = extentsB[1] * AbsR[0][2] + extentsB[2] * AbsR[0][1];
+	if (glm::abs(transVector[2] * R[1][0] - transVector[1] * R[2][0]) > rA + rB) return 0;
+
+	//test axis A0xB1
+	rA = extentsA[1] * AbsR[2][1] + extentsA[2] * AbsR[1][1];
+	rB = extentsB[0] * AbsR[0][2] + extentsB[2] * AbsR[0][0];
+	if (glm::abs(transVector[2] * R[1][1] - transVector[1] * R[2][1]) > rA + rB) return 0;
+
+	//test axis A0xB2
+	rA = extentsA[1] * AbsR[2][2] + extentsA[2] * AbsR[1][2];
+	rB = extentsB[0] * AbsR[0][1] + extentsB[1] * AbsR[0][0];
+	if (glm::abs(transVector[2] * R[1][2] - transVector[1] * R[2][2]) > rA + rB) return 0;
+
+	//test axis A1xB0
+	rA = extentsA[0] * AbsR[2][0] + extentsA[2] * AbsR[0][0];
+	rB = extentsB[1] * AbsR[1][2] + extentsB[2] * AbsR[1][1];
+	if (glm::abs(transVector[0] * R[2][0] - transVector[2] * R[0][0]) > rA + rB) return 0;
+
+	//test axis A1xB1
+	rA = extentsA[0] * AbsR[2][1] + extentsA[2] * AbsR[0][1];
+	rB = extentsB[0] * AbsR[1][2] + extentsB[2] * AbsR[1][0];
+	if (glm::abs(transVector[0] * R[2][1] - transVector[2] * R[0][1]) > rA + rB) return 0;
+
+	//test axis A1xB2
+	rA = extentsA[0] * AbsR[2][2] + extentsA[2] * AbsR[0][2];
+	rB = extentsB[0] * AbsR[1][1] + extentsB[1] * AbsR[1][0];
+	if (glm::abs(transVector[0] * R[2][2] - transVector[2] * R[0][2]) > rA + rB) return 0;
+
+	//test axis A2xB0
+	rA = extentsA[0] * AbsR[1][0] + extentsA[1] * AbsR[0][0];
+	rB = extentsB[1] * AbsR[2][2] + extentsB[2] * AbsR[2][1];
+	if (glm::abs(transVector[1] * R[0][0] - transVector[0] * R[1][0]) > rA + rB) return 0;
+
+	//test axis A2xB1
+	rA = extentsA[0] * AbsR[1][1] + extentsA[1] * AbsR[0][1];
+	rB = extentsB[0] * AbsR[2][2] + extentsB[2] * AbsR[2][0];
+	if (glm::abs(transVector[1] * R[0][1] - transVector[0] * R[1][1]) > rA + rB) return 0;
+
+	//test axis A2xB2
+	rA = extentsA[0] * AbsR[1][2] + extentsA[1] * AbsR[0][2];
+	rB = extentsB[0] * AbsR[2][1] + extentsB[1] * AbsR[2][0];
+	if (glm::abs(transVector[1] * R[0][2] - transVector[0] * R[1][2]) > rA + rB) return 0;
 
 	//there is no axis test that separates this two objects
 	return eSATResults::SAT_NONE;
