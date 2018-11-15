@@ -1,6 +1,14 @@
 #include "MyRigidBody.h"
 using namespace Simplex;
 //Allocation
+void MakeCubic(void)
+{
+	float fSize = m_v3HalfWidth.x;
+	fSize = glm::max(fSize, m_v3HalfWidth.y);
+	fSize = glm::max(fSize, m_v3HalfWidth.z);
+	m_v3HalfWidth = vector3(fSize);
+	
+}
 void MyRigidBody::Init(void)
 {
 	m_pMeshMngr = MeshManager::GetInstance();
@@ -163,7 +171,7 @@ MyRigidBody::MyRigidBody(std::vector<vector3> a_pointList)
 	m_v3MaxG = m_v3MaxL;
 
 	//with the max and the min we calculate the center
-	m_v3CenterL = (m_v3MaxL + m_v3MinL) / 2.0f;
+	m_v3CenterG = m_v3CenterL = (m_v3MaxL + m_v3MinL) / 2.0f;
 
 	//we calculate the distance between min and max vectors
 	m_v3HalfWidth = (m_v3MaxL - m_v3MinL) / 2.0f;
