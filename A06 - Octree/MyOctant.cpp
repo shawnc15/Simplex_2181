@@ -30,7 +30,7 @@ MyOctant::MyOctant()
 	}
 
 	m_pRigidBody = new MyRigidBody(v3MaxMin_list);
-	m_pRigidBody->MakeCubic();
+	//m_pRigidBody->MakeCubic();
 	m_iID = m_nCount;
 	Subdivide();
 }

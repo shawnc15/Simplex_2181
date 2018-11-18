@@ -17,6 +17,10 @@ void Simplex::MyEntityManager::Release(void)
 	m_uEntityCount = 0;
 	m_mEntityArray = nullptr;
 }
+std::vector<MyEntity*> Simplex::MyEntityManager::GetEntityList(void)
+{
+	return m_EntityList;
+}
 Simplex::MyEntityManager* Simplex::MyEntityManager::GetInstance()
 {
 	if(m_pInstance == nullptr)

@@ -103,6 +103,7 @@ void Simplex::MyOctant::IsColliding(void)
 		if (pRB->IsColliding(m_pRigidBody))
 		{
 			l_Entity_List[i]->AddDimension(m_iID);
+			std::cout << "collide" << std::endl;
 		}
 	}
 }
