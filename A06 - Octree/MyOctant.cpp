@@ -12,6 +12,7 @@ void MyOctant::Init(void)
 	{
 		m_pChild[i] = nullptr;
 	}
+
 }
 
 MyOctant::MyOctant()
@@ -32,7 +33,28 @@ MyOctant::MyOctant()
 	m_pRigidBody = new MyRigidBody(v3MaxMin_list);
 	m_pRigidBody->MakeCubic();
 	m_iID = m_nCount;
-	Subdivide();
+	Subdivide(1);
+}
+
+MyOctant::MyOctant(uint octLvl)
+{
+	Init();
+	std::vector<MyEntity*> l_Entity_List = m_pEntityMngr->GetEntityList();
+	uint iEntityCount = l_Entity_List.size();
+	std::vector<vector3> v3MaxMin_list;
+	for (uint i = 0; i < iEntityCount; ++i)
+	{
+		MyRigidBody* pRG = l_Entity_List[i]->GetRigidBody();
+		vector3 v3Min = pRG->GetMinGlobal();
+		vector3 v3Max = pRG->GetMaxGlobal();
+		v3MaxMin_list.push_back(v3Min);
+		v3MaxMin_list.push_back(v3Max);
+	}
+
+	m_pRigidBody = new MyRigidBody(v3MaxMin_list);
+	m_pRigidBody->MakeCubic();
+	m_iID = m_nCount;
+	Subdivide(octLvl);
 }
 
 MyOctant::MyOctant(vector3 a_v3Center, float a_fSize)
@@ -46,9 +68,9 @@ MyOctant::MyOctant(vector3 a_v3Center, float a_fSize)
 	m_iID = m_nCount;
 }
 
-void MyOctant::Subdivide()
+void MyOctant::Subdivide(uint max)
 {
-	if (m_nLevel >= 0)
+	if (m_nLevel >= max)
 		return;
 
 	vector3 v3Center = m_pRigidBody->GetCenterLocal();
@@ -70,9 +92,9 @@ void MyOctant::Subdivide()
 	{
 		m_pChild[i]->m_nLevel = m_nLevel + 1;
 		m_pChild[i]->m_pParent = this;
-		m_pChild[i]->Subdivide();
+		m_pChild[i]->Subdivide(max);
 	}
-	IsColliding();
+	//IsColliding();
 }
 
 void MyOctant::Swap(MyOctant& other)

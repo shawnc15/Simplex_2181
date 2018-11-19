@@ -183,7 +183,7 @@ void Simplex::MyEntityManager::Update(void)
 	{
 		for (uint j = i + 1; j < m_uEntityCount; j++)
 		{
-			m_mEntityArray[i]->IsColliding(m_mEntityArray[j]);
+			//m_mEntityArray[i]->IsColliding(m_mEntityArray[j]);
 		}
 	}
 }
@@ -331,6 +331,13 @@ void Simplex::MyEntityManager::RemoveDimension(String a_sUniqueID, uint a_uDimen
 	if (pTemp)
 	{
 		pTemp->RemoveDimension(a_uDimension);
+	}
+}
+void Simplex::MyEntityManager::ClearDimensionSetAll(void)
+{
+	for (uint i = 0; i < m_uEntityCount; ++i)
+	{
+		ClearDimensionSet(i);
 	}
 }
 void Simplex::MyEntityManager::ClearDimensionSet(uint a_uIndex)

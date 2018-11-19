@@ -27,8 +27,9 @@ namespace Simplex
 	public:
 		void Display(void);
 		void IsColliding(void);
-		void Subdivide(void);
+		void Subdivide(uint max);
 		MyOctant(vector3 a_v3Center, float a_fSize);
+		MyOctant(uint octLvl);
 		/*
 		Usage: Constructor
 		Arguments: ---
