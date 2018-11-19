@@ -7,7 +7,7 @@ void MyOctant::Init(void)
 	m_nData = 0;
 	m_pMeshMngr = MeshManager::GetInstance();
 	m_pEntityMngr = MyEntityManager::GetInstance();
-	IsColliding();
+	//IsColliding();
 	for (uint i = 0; i < 8; i++)
 	{
 		m_pChild[i] = nullptr;
@@ -103,7 +103,6 @@ void Simplex::MyOctant::IsColliding(void)
 		if (pRB->IsColliding(m_pRigidBody))
 		{
 			l_Entity_List[i]->AddDimension(m_iID);
-			std::cout << "collide" << std::endl;
 		}
 	}
 }
