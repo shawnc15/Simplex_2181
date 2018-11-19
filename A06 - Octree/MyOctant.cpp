@@ -93,8 +93,8 @@ void MyOctant::Subdivide(uint max)
 		m_pChild[i]->m_nLevel = m_nLevel + 1;
 		m_pChild[i]->m_pParent = this;
 		m_pChild[i]->Subdivide(max);
+		m_pChild[i]->IsColliding();
 	}
-	//IsColliding();
 }
 
 void MyOctant::Swap(MyOctant& other)

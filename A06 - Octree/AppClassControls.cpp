@@ -125,7 +125,7 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 			m_uOctantID = - 1;
 		*/
 		break;
-	case sf::Keyboard::Add:
+	case sf::Keyboard::K:
 		if (m_uOctantLevels < 4)
 		{
 			m_pEntityMngr->ClearDimensionSetAll();
@@ -136,7 +136,7 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 			
 		}
 		break;
-	case sf::Keyboard::Subtract:
+	case sf::Keyboard::L:
 		if (m_uOctantLevels > 0)
 		{
 			m_pEntityMngr->ClearDimensionSetAll();
