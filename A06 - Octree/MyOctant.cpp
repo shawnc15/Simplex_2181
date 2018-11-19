@@ -48,7 +48,7 @@ MyOctant::MyOctant(vector3 a_v3Center, float a_fSize)
 
 void MyOctant::Subdivide()
 {
-	if (m_nLevel > 0)
+	if (m_nLevel >= 0)
 		return;
 
 	vector3 v3Center = m_pRigidBody->GetCenterLocal();
