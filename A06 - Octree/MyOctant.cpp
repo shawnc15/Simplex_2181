@@ -71,7 +71,10 @@ MyOctant::MyOctant(vector3 a_v3Center, float a_fSize)
 void MyOctant::Subdivide(uint max)
 {
 	if (m_nLevel >= max)
+	{
+		IsColliding();
 		return;
+	}
 
 	vector3 v3Center = m_pRigidBody->GetCenterLocal();
 	vector3 v3HalfWidth = m_pRigidBody->GetHalfWidth();
@@ -87,13 +90,12 @@ void MyOctant::Subdivide(uint max)
 	m_pChild[5] = new MyOctant(v3Center + vector3(-fCenters, fCenters, -fCenters), fSize);
 	m_pChild[6] = new MyOctant(v3Center + vector3(-fCenters, -fCenters, -fCenters), fSize);
 	m_pChild[7] = new MyOctant(v3Center + vector3(fCenters, -fCenters, -fCenters), fSize);
-
+	
 	for (uint i = 0; i < 8; i++)
 	{
 		m_pChild[i]->m_nLevel = m_nLevel + 1;
 		m_pChild[i]->m_pParent = this;
 		m_pChild[i]->Subdivide(max);
-		m_pChild[i]->IsColliding();
 	}
 }
 
