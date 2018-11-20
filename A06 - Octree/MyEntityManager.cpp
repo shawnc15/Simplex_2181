@@ -23,6 +23,13 @@ std::vector<MyEntity*> Simplex::MyEntityManager::GetEntityList(void)
 {
 	return m_EntityList;
 }
+//void Simplex::MyEntityManager::SetEntityList(std::vector<MyEntity*> list)
+//{
+//	for (uint i = 0; i < m_EntityList.size(); i++)
+//	{
+//		m_EntityList[i] = list[i];
+//	}
+//}
 MyEntityManager* MyEntityManager::GetInstance()
 {
 	if (m_pInstance == nullptr)
@@ -183,7 +190,7 @@ void Simplex::MyEntityManager::Update(void)
 	{
 		for (uint j = i + 1; j < m_uEntityCount; j++)
 		{
-			//m_EntityList[i]->IsColliding(m_EntityList[j]);
+			m_EntityList[i]->IsColliding(m_EntityList[j]);
 		}
 	}
 }

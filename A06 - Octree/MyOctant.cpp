@@ -7,6 +7,7 @@ void MyOctant::Init(void)
 	m_nData = 0;
 	m_pMeshMngr = MeshManager::GetInstance();
 	m_pEntityMngr = MyEntityManager::GetInstance();
+	l_Entity_List = m_pEntityMngr->GetEntityList();
 	//IsColliding();
 	for (uint i = 0; i < 8; i++)
 	{
@@ -120,7 +121,6 @@ void Simplex::MyOctant::Display(void)
 }
 void Simplex::MyOctant::IsColliding(void)
 {
-	std::vector<MyEntity*> l_Entity_List = m_pEntityMngr->GetEntityList();
 	uint iEntityCount = l_Entity_List.size();
 	for (uint i = 0; i < iEntityCount; ++i)
 	{
@@ -128,8 +128,13 @@ void Simplex::MyOctant::IsColliding(void)
 		if (pRB->IsColliding(m_pRigidBody))
 		{
 			l_Entity_List[i]->AddDimension(m_iID);
+			m_pEntityMngr->AddDimension(i, m_iID);
 		}
 	}
+}
+std::vector<MyEntity*> MyOctant::GetList()
+{
+	return l_Entity_List;
 }
 MyOctant::MyOctant(MyOctant const& other)
 {

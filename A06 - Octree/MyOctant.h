@@ -19,6 +19,7 @@ namespace Simplex
 		MeshManager* m_pMeshMngr = nullptr; //Pointer to Mesh manager
 		MyEntityManager* m_pEntityMngr = nullptr;
 		MyRigidBody* m_pRigidBody = nullptr;
+		std::vector<MyEntity*> l_Entity_List;
 		uint m_iID = 0;
 		static uint m_nCount;
 		MyOctant* m_pParent = nullptr;
@@ -28,6 +29,7 @@ namespace Simplex
 		void Display(void);
 		void IsColliding(void);
 		void Subdivide(uint max);
+		std::vector<MyEntity*> GetList();
 		MyOctant(vector3 a_v3Center, float a_fSize);
 		MyOctant(uint octLvl);
 		/*
