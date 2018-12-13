@@ -20,13 +20,15 @@ class MyOctant
 	MyEntityManager* m_pEntityMngr = nullptr;
 	MyRigidBody* m_pRigidBody = nullptr;
 	uint m_iID = 0;
+	static uint m_nCount;
 	MyOctant* m_pParent = nullptr;
 	MyOctant* m_pChild[8];
+	uint m_nLevel = 0;
 public:
 	void Display(void);
 	void IsColliding(void);
 	void Subdivide(void);
-	MyOctant(vector3 m_v3Size);
+	MyOctant(vector3 a_v3Center, float a_fSize);
 	/*
 	Usage: Constructor
 	Arguments: ---

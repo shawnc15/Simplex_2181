@@ -7,11 +7,13 @@ void MyOctant::Init(void)
 	m_nData = 0;
 	m_pMeshMngr = MeshManager::GetInstance();
 	m_pEntityMngr = MyEntityManager::GetInstance();
+	l_Entity_List = m_pEntityMngr->GetEntityList();
 	//IsColliding();
 	for (uint i = 0; i < 8; i++)
 	{
 		m_pChild[i] = nullptr;
 	}
+
 }
 
 MyOctant::MyOctant()
@@ -32,7 +34,28 @@ MyOctant::MyOctant()
 	m_pRigidBody = new MyRigidBody(v3MaxMin_list);
 	m_pRigidBody->MakeCubic();
 	m_iID = m_nCount;
-	Subdivide();
+	Subdivide(1);
+}
+
+MyOctant::MyOctant(uint octLvl)
+{
+	Init();
+	std::vector<MyEntity*> l_Entity_List = m_pEntityMngr->GetEntityList();
+	uint iEntityCount = l_Entity_List.size();
+	std::vector<vector3> v3MaxMin_list;
+	for (uint i = 0; i < iEntityCount; ++i)
+	{
+		MyRigidBody* pRG = l_Entity_List[i]->GetRigidBody();
+		vector3 v3Min = pRG->GetMinGlobal();
+		vector3 v3Max = pRG->GetMaxGlobal();
+		v3MaxMin_list.push_back(v3Min);
+		v3MaxMin_list.push_back(v3Max);
+	}
+
+	m_pRigidBody = new MyRigidBody(v3MaxMin_list);
+	m_pRigidBody->MakeCubic();
+	m_iID = m_nCount;
+	Subdivide(octLvl);
 }
 
 MyOctant::MyOctant(vector3 a_v3Center, float a_fSize)
@@ -46,31 +69,34 @@ MyOctant::MyOctant(vector3 a_v3Center, float a_fSize)
 	m_iID = m_nCount;
 }
 
-void MyOctant::Subdivide()
+void MyOctant::Subdivide(uint max)
 {
-	if (m_nLevel > 0)
+	if (m_nLevel >= max)
+	{
+		IsColliding();
 		return;
+	}
 
 	vector3 v3Center = m_pRigidBody->GetCenterLocal();
 	vector3 v3HalfWidth = m_pRigidBody->GetHalfWidth();
 	float fSize = (v3HalfWidth.x) / 2.0f;
 	float fCenters = fSize;
 
-	m_pChild[0] = new MyOctant(v3Center + vector3( fCenters, fCenters, fCenters), fSize);
+	m_pChild[0] = new MyOctant(v3Center + vector3(fCenters, fCenters, fCenters), fSize);
 	m_pChild[1] = new MyOctant(v3Center + vector3(-fCenters, fCenters, fCenters), fSize);
-	m_pChild[2] = new MyOctant(v3Center + vector3(-fCenters,-fCenters, fCenters), fSize);
-	m_pChild[3] = new MyOctant(v3Center + vector3( fCenters,-fCenters, fCenters), fSize);
-	
-	m_pChild[4] = new MyOctant(v3Center + vector3( fCenters, fCenters,-fCenters), fSize);
-	m_pChild[5] = new MyOctant(v3Center + vector3(-fCenters, fCenters,-fCenters), fSize);
-	m_pChild[6] = new MyOctant(v3Center + vector3(-fCenters,-fCenters,-fCenters), fSize);
-	m_pChild[7] = new MyOctant(v3Center + vector3( fCenters,-fCenters,-fCenters), fSize);
+	m_pChild[2] = new MyOctant(v3Center + vector3(-fCenters, -fCenters, fCenters), fSize);
+	m_pChild[3] = new MyOctant(v3Center + vector3(fCenters, -fCenters, fCenters), fSize);
+
+	m_pChild[4] = new MyOctant(v3Center + vector3(fCenters, fCenters, -fCenters), fSize);
+	m_pChild[5] = new MyOctant(v3Center + vector3(-fCenters, fCenters, -fCenters), fSize);
+	m_pChild[6] = new MyOctant(v3Center + vector3(-fCenters, -fCenters, -fCenters), fSize);
+	m_pChild[7] = new MyOctant(v3Center + vector3(fCenters, -fCenters, -fCenters), fSize);
 	
 	for (uint i = 0; i < 8; i++)
 	{
 		m_pChild[i]->m_nLevel = m_nLevel + 1;
 		m_pChild[i]->m_pParent = this;
-		m_pChild[i]->Subdivide();
+		m_pChild[i]->Subdivide(max);
 	}
 }
 
@@ -95,7 +121,6 @@ void Simplex::MyOctant::Display(void)
 }
 void Simplex::MyOctant::IsColliding(void)
 {
-	std::vector<MyEntity*> l_Entity_List = m_pEntityMngr->GetEntityList();
 	uint iEntityCount = l_Entity_List.size();
 	for (uint i = 0; i < iEntityCount; ++i)
 	{
@@ -103,8 +128,13 @@ void Simplex::MyOctant::IsColliding(void)
 		if (pRB->IsColliding(m_pRigidBody))
 		{
 			l_Entity_List[i]->AddDimension(m_iID);
+			m_pEntityMngr->AddDimension(i, m_iID);
 		}
 	}
+}
+std::vector<MyEntity*> MyOctant::GetList()
+{
+	return l_Entity_List;
 }
 MyOctant::MyOctant(MyOctant const& other)
 {
@@ -113,7 +143,7 @@ MyOctant::MyOctant(MyOctant const& other)
 }
 MyOctant& MyOctant::operator=(MyOctant const& other)
 {
-	if(this != &other)
+	if (this != &other)
 	{
 		Release();
 		Init();
@@ -122,11 +152,11 @@ MyOctant& MyOctant::operator=(MyOctant const& other)
 	}
 	return *this;
 }
-MyOctant::~MyOctant(){Release();};
+MyOctant::~MyOctant() { Release(); };
 //Accessors
-void MyOctant::SetData(int a_nData){ m_nData = a_nData; }
-int MyOctant::GetData(void){ return m_nData; }
-void MyOctant::SetDataOnVector(int a_nData){ m_lData.push_back(a_nData);}
+void MyOctant::SetData(int a_nData) { m_nData = a_nData; }
+int MyOctant::GetData(void) { return m_nData; }
+void MyOctant::SetDataOnVector(int a_nData) { m_lData.push_back(a_nData); }
 int& MyOctant::GetDataOnVector(int a_nIndex)
 {
 	int nIndex = static_cast<int>(m_lData.size());

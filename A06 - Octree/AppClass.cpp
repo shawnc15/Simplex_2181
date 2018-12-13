@@ -11,7 +11,7 @@ void Application::InitVariables(void)
 	m_pLightMngr->SetPosition(vector3(0.0f, 3.0f, 13.0f), 1); //set the position of first light (0 is reserved for ambient light)
 
 #ifdef DEBUG
-	uint uInstances = 900;
+	uint uInstances = 300;
 #else
 	uint uInstances = 1849;
 #endif
@@ -31,6 +31,7 @@ void Application::InitVariables(void)
 	}
 	m_uOctantLevels = 1;
 	m_pEntityMngr->Update();
+	m_pRoot = new MyOctant(m_uOctantLevels);
 }
 void Application::Update(void)
 {
@@ -48,6 +49,7 @@ void Application::Update(void)
 
 	//Add objects to render list
 	m_pEntityMngr->AddEntityToRenderList(-1, true);
+	m_pRoot->Display();
 }
 void Application::Display(void)
 {
@@ -56,7 +58,7 @@ void Application::Display(void)
 
 	//display octree
 	//m_pRoot->Display();
-	
+
 	// draw a skybox
 	m_pMeshMngr->AddSkyboxToRenderList();
 	
@@ -74,6 +76,7 @@ void Application::Display(void)
 }
 void Application::Release(void)
 {
+	SafeDelete(m_pRoot);
 	//release GUI
 	ShutdownGUI();
 }
