@@ -1,7 +1,7 @@
 #include "MyRigidBody.h"
 using namespace Simplex;
 //Allocation
-void MakeCubic(void)
+void MyRigidBody::MakeCubic(void)
 {
 	float fSize = m_v3HalfWidth.x;
 	fSize = glm::max(fSize, m_v3HalfWidth.y);
